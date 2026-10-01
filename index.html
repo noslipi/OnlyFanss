@@ -1,0 +1,701 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>OnlyFans</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f7;
+      color: #222;
+    }
+
+    /* -----------------------------
+       PÁGINA PRINCIPAL
+    ----------------------------- */
+
+    .navbar {
+      height: 64px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 25px;
+    }
+
+    .logo {
+      color: #168dcc;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .login {
+      padding: 9px 17px;
+      border: 1px solid #168dcc;
+      border-radius: 7px;
+      background: white;
+      color: #168dcc;
+    }
+
+    .profile {
+      max-width: 850px;
+      margin: 35px auto;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    }
+
+    .cover {
+      height: 220px;
+      background: linear-gradient(
+        120deg,
+        #168dcc,
+        #8ed8ff
+      );
+    }
+
+    .profile-info {
+      padding: 0 30px 30px;
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+
+      margin-top: -55px;
+
+      border: 5px solid white;
+      border-radius: 50%;
+
+      background: #ddd;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 42px;
+    }
+
+    .name {
+      margin-top: 12px;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .username {
+      margin-top: 4px;
+      color: #777;
+    }
+
+    .description {
+      margin-top: 18px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .subscription {
+      margin-top: 25px;
+
+      padding: 22px;
+
+      border: 1px solid #ddd;
+      border-radius: 10px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .price span {
+      color: #777;
+      font-size: 14px;
+      font-weight: normal;
+    }
+
+    .subscribe {
+      padding: 13px 25px;
+
+      border: none;
+      border-radius: 8px;
+
+      background: #168dcc;
+      color: white;
+
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .content {
+      max-width: 850px;
+      margin: 0 auto 50px;
+
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .post {
+      min-height: 170px;
+
+      padding: 20px;
+
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .locked {
+      height: 100px;
+
+      border-radius: 8px;
+      background: #eee;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 30px;
+    }
+
+    .post p {
+      margin-top: 12px;
+      color: #555;
+    }
+
+
+    /* -----------------------------
+       PANTALLA DE CARGA
+    ----------------------------- */
+
+    #loadingScreen {
+      position: fixed;
+      inset: 0;
+
+      z-index: 1000;
+
+      background: white;
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      gap: 20px;
+    }
+
+    .loading-title {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .loading-text {
+      color: #777;
+    }
+
+    .progress-container {
+      width: min(450px, 80%);
+
+      height: 10px;
+
+      overflow: hidden;
+
+      border-radius: 20px;
+      background: #e5e5e5;
+    }
+
+    #progress {
+      width: 0%;
+      height: 100%;
+
+      border-radius: 20px;
+
+      background: #168dcc;
+
+      transition: width .1s linear;
+    }
+
+
+    /* -----------------------------
+       PARPADEO
+    ----------------------------- */
+
+    #flash {
+      position: fixed;
+      inset: 0;
+
+      z-index: 2000;
+
+      display: none;
+
+      background: white;
+
+      pointer-events: none;
+    }
+
+    .flash-animation {
+      animation: flashEffect .12s infinite;
+    }
+
+    @keyframes flashEffect {
+
+      0% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+
+    }
+
+
+    /* -----------------------------
+       SCREAMER
+    ----------------------------- */
+
+    #screamer {
+      position: fixed;
+      inset: 0;
+
+      z-index: 3000;
+
+      display: none;
+
+      background: black;
+
+      align-items: center;
+      justify-content: center;
+    }
+
+    #screamer img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+
+      animation: zoomScreamer .25s ease-out;
+    }
+
+    @keyframes zoomScreamer {
+
+      from {
+        transform: scale(1.8);
+      }
+
+      to {
+        transform: scale(1);
+      }
+
+    }
+
+    #closeScreamer {
+      position: absolute;
+
+      top: 20px;
+      right: 20px;
+
+      z-index: 4000;
+
+      padding: 10px 16px;
+
+      border: 1px solid white;
+      border-radius: 6px;
+
+      background: rgba(0,0,0,.7);
+      color: white;
+
+      cursor: pointer;
+    }
+
+
+    @media(max-width:650px) {
+
+      .content {
+        grid-template-columns: 1fr;
+        padding: 0 15px;
+      }
+
+      .profile {
+        margin: 15px;
+      }
+
+      .subscription {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .subscribe {
+        width: 100%;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+
+  <!-- =========================
+       PÁGINA PRINCIPAL
+  ========================== -->
+
+  <nav class="navbar">
+
+    <div class="logo">
+      Exclusive
+    </div>
+
+    <button class="login">
+      Iniciar sesión
+    </button>
+
+  </nav>
+
+
+  <main>
+
+    <section class="profile">
+
+      <div class="cover"></div>
+
+      <div class="profile-info">
+
+        <div class="avatar">
+          👤
+        </div>
+
+        <div class="name">
+          Luna
+        </div>
+
+        <div class="username">
+          @luna_private
+        </div>
+
+        <p class="description">
+          Contenido exclusivo para suscriptores ✨
+        </p>
+
+
+        <div class="subscription">
+
+          <div>
+
+            <div class="price">
+              $4.99 <span>/ mes</span>
+            </div>
+
+            <small>
+              Acceso al contenido exclusivo
+            </small>
+
+          </div>
+
+
+          <button
+            class="subscribe"
+            onclick="startPrank()">
+
+            Ver contenido
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="content">
+
+      <div class="post">
+        <div class="locked">🔒</div>
+        <p>Contenido exclusivo para suscriptores</p>
+      </div>
+
+      <div class="post">
+        <div class="locked">🔒</div>
+        <p>Nueva publicación privada</p>
+      </div>
+
+      <div class="post">
+        <div class="locked">🔒</div>
+        <p>Contenido bloqueado</p>
+      </div>
+
+      <div class="post">
+        <div class="locked">🔒</div>
+        <p>Publicación exclusiva</p>
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       PANTALLA DE CARGA
+  ========================== -->
+
+  <div id="loadingScreen">
+
+    <div class="loading-title">
+      Preparando contenido...
+    </div>
+
+    <div class="loading-text" id="loadingText">
+      Conectando...
+    </div>
+
+    <div class="progress-container">
+
+      <div id="progress"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       FLASH
+  ========================== -->
+
+  <div id="flash"></div>
+
+
+  <!-- =========================
+       SCREAMER
+  ========================== -->
+
+  <div id="screamer">
+
+    <button id="closeScreamer">
+      Cerrar
+    </button>
+
+    <img
+      src="screamer.jpg"
+      alt="Screamer">
+
+  </div>
+
+
+  <script>
+
+    function startPrank() {
+
+      const loading =
+        document.getElementById("loadingScreen");
+
+      const progress =
+        document.getElementById("progress");
+
+      const loadingText =
+        document.getElementById("loadingText");
+
+      const flash =
+        document.getElementById("flash");
+
+      const screamer =
+        document.getElementById("screamer");
+
+
+      /*
+       * Mostrar pantalla de carga
+       */
+
+      loading.style.display = "flex";
+
+
+      let percentage = 0;
+
+
+      /*
+       * Barra de progreso
+       */
+
+      const progressInterval = setInterval(() => {
+
+        percentage += Math.random() * 7 + 2;
+
+        if (percentage >= 100) {
+
+          percentage = 100;
+
+          clearInterval(progressInterval);
+
+        }
+
+        progress.style.width =
+          percentage + "%";
+
+
+        /*
+         * Cambiar mensajes
+         */
+
+        if (percentage < 30) {
+
+          loadingText.textContent =
+            "Conectando...";
+
+        }
+
+        else if (percentage < 60) {
+
+          loadingText.textContent =
+            "Preparando contenido...";
+
+        }
+
+        else if (percentage < 85) {
+
+          loadingText.textContent =
+            "Cargando contenido privado...";
+
+        }
+
+        else {
+
+          loadingText.textContent =
+            "Casi listo...";
+
+        }
+
+      }, 100);
+
+
+      /*
+       * Después de terminar la carga
+       */
+
+      setTimeout(() => {
+
+        loading.style.display = "none";
+
+
+        /*
+         * PARPADEO
+         */
+
+        flash.style.display = "block";
+
+        flash.classList.add(
+          "flash-animation"
+        );
+
+
+        /*
+         * Pequeña pausa antes del susto
+         */
+
+        setTimeout(() => {
+
+          flash.classList.remove(
+            "flash-animation"
+          );
+
+          flash.style.display = "none";
+
+
+          /*
+           * MOSTRAR SCREAMER
+           */
+
+          screamer.style.display = "flex";
+
+
+          /*
+           * Reproducir sonido
+           */
+
+          const audio =
+            new Audio("scream.mp3");
+
+          audio.volume = 1;
+
+          audio.play().catch(() => {
+
+            console.log(
+              "El navegador bloqueó el audio."
+            );
+
+          });
+
+        }, 450);
+
+      }, 3000);
+
+    }
+
+
+    /*
+     * Cerrar screamer
+     */
+
+    document
+      .getElementById("closeScreamer")
+      .addEventListener("click", function(event) {
+
+        event.stopPropagation();
+
+        document
+          .getElementById("screamer")
+          .style.display = "none";
+
+      });
+
+
+    /*
+     * También se puede cerrar
+     * haciendo clic sobre la pantalla
+     */
+
+    document
+      .getElementById("screamer")
+      .addEventListener("click", function(event) {
+
+        if (
+          event.target.tagName !== "BUTTON"
+        ) {
+
+          this.style.display = "none";
+
+        }
+
+      });
+
+  </script>
+
+</body>
+</html>
+```
